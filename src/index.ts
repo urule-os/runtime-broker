@@ -12,3 +12,12 @@ app.listen({ port: config.port, host: '0.0.0.0' }, (err, address) => {
   }
   app.log.info(`urule-runtime-broker listening on ${address}`);
 });
+
+// Graceful shutdown
+const shutdown = async () => {
+  app.log.info('Shutting down...');
+  await app.close();
+  process.exit(0);
+};
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
