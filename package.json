@@ -14,7 +14,8 @@
     "@urule/auth-middleware": "file:../urule-auth-middleware",
     "fastify": "^5.3.3",
     "nats": "^2.29.3",
-    "ulid": "^2.3.0"
+    "ulid": "^2.3.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^22.15.18",

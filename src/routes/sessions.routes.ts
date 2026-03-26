@@ -1,5 +1,13 @@
 import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 import type { SessionManager } from '../services/session-manager.js';
+
+const allocateSessionSchema = z.object({
+  provider: z.string().optional(),
+  workspaceId: z.string(),
+  runtimeProfile: z.string().min(1),
+  env: z.record(z.string(), z.string()).optional(),
+});
 
 export async function sessionsRoutes(
   app: FastifyInstance,
@@ -11,7 +19,11 @@ export async function sessionsRoutes(
   app.post<{
     Body: { provider?: string; workspaceId: string; runtimeProfile: string; env?: Record<string, string> };
   }>('/api/v1/sessions', async (request, reply) => {
-    const { provider = 'mock', workspaceId, runtimeProfile, env } = request.body;
+    const parsed = allocateSessionSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'Validation failed', details: parsed.error.issues });
+    }
+    const { provider = 'mock', workspaceId, runtimeProfile, env } = parsed.data;
 
     try {
       const session = await sessionManager.allocateSession(provider, {
